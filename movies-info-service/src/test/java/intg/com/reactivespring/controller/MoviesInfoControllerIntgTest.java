@@ -144,13 +144,13 @@ class MoviesInfoControllerIntgTest {
                 .uri(MOVIES_INFO_URL+"/{id}", movieInfoId)
                 .exchange()
                 .expectStatus()
-                .is2xxSuccessful()
-                .expectBody(MovieInfo.class)
+                .isNoContent();
+                /*.expectBody(MovieInfo.class)
                 .consumeWith(
                         movieInfoEntityExchangeResult -> {
                             var deletedMovieInfo = movieInfoEntityExchangeResult.getResponseBody();
                             assertNull(deletedMovieInfo);
                         }
-                );
+                );*/
     }
 }
