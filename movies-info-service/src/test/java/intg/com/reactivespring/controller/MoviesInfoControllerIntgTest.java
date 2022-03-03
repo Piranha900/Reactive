@@ -10,6 +10,7 @@ import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWeb
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.reactive.server.WebTestClient;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -88,6 +89,24 @@ class MoviesInfoControllerIntgTest {
     }
 
     @Test
+    void getMovieInfoByYear() {
+
+        var uri = UriComponentsBuilder.fromUriString(MOVIES_INFO_URL)
+                .queryParam("year", 2005)
+                .buildAndExpand().toUri();
+
+        webTestClient
+                .get()
+                .uri(uri)
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBodyList(MovieInfo.class)
+                .hasSize(1);
+
+    }
+
+    @Test
     void getMovieInfoById() {
 
         var movieInfoId = "abc";
@@ -104,6 +123,19 @@ class MoviesInfoControllerIntgTest {
                     var movieInfo = movieInfoEntityExchangeResult.getResponseBody();
                     assertNotNull(movieInfo);
                 });*/
+
+    }
+
+    @Test
+    void getMovieInfoById_notfound() {
+
+        var movieInfoId = "def";
+        webTestClient
+                .get()
+                .uri(MOVIES_INFO_URL+"/{id}", movieInfoId)
+                .exchange()
+                .expectStatus()
+                .isNotFound();
 
     }
 
@@ -130,6 +162,26 @@ class MoviesInfoControllerIntgTest {
                     assertNotNull(updatedMovieInfo.getMovieInfoId());
                     assertEquals("Dark Knight Rises1", updatedMovieInfo.getName());
                 });
+
+
+        //then
+    }
+
+    @Test
+    void updateMovieInfo_notfound() {
+        //given
+        var movieInfo = new MovieInfo(null, "Dark Knight Rises1",
+                2005, List.of("Christian Bale", "Michael Cane"), LocalDate.parse("2005-06-15"));
+
+        var movieInfoId = "def";
+        //when
+        webTestClient
+                .put()
+                .uri(MOVIES_INFO_URL + "/{id}", movieInfoId)
+                .bodyValue(movieInfo)
+                .exchange()
+                .expectStatus()
+                .isNotFound();
 
 
         //then
